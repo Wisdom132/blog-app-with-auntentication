@@ -13,10 +13,10 @@ const blogSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category"
   },
-  // featuredImage: {
-  //   type: String,
-  //   required: true
-  // },
+  featured_image: {
+    type: Object,
+    required: true
+  },
   content: {
     type: String,
     required: true

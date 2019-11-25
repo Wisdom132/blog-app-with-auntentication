@@ -36,10 +36,16 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
+// configure page error handling
+const error = require("./config/error");
+app.use(error.error);
+app.use(error.err);
+
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
+app.use("/uploads", express.static("uploads"));
 // create a custome middleware for authentication
 const checkUserType = (req, res, next) => {
   const userType = req.originalUrl.split("/")[2];

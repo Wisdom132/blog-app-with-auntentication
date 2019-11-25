@@ -1,6 +1,7 @@
 const express = require("express");
 const Blog = require("../model/blog");
 const Category = require("../../category/model/category");
+const upload = require("../../../config/multer");
 
 // get all blog post
 exports.getBlogPosts = async (req, res) => {
@@ -8,7 +9,7 @@ exports.getBlogPosts = async (req, res) => {
     let response = await Blog.find()
       .populate("category")
       .select(
-        "tags dateCreated title content category.title category.description"
+        "tags dateCreated title content category.title category.description featured_image.path featured_image.originalname"
       );
     res.status(200).json({
       data: response
@@ -27,8 +28,10 @@ exports.createNewPost = async (req, res) => {
       title: req.body.title,
       tags: req.body.tags,
       category: req.body.category,
-      content: req.body.content
+      content: req.body.content,
+      featured_image: req.file
     });
+
     let response = await blog.save();
     res.status(200).json({
       data: response
