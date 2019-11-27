@@ -112,12 +112,14 @@ exports.confirmationPost = (req, res, next) => {
         });
 
       // so here if the valid status is true it displays this message
-      //remember that `isVerified i`
+      //remember that `isVerified is set to false by default`
       if (user.isVerified)
         return res.status(400).send({
           type: "already-verified",
           msg: "This user has already been verified."
         });
+
+      //if all validation is passed we set `isverified` to true
       user.isVerified = true;
       user.save(function(err) {
         if (err) {
@@ -126,6 +128,80 @@ exports.confirmationPost = (req, res, next) => {
           });
         }
         res.status(200).send("The account has been verified. Please log in.");
+      });
+    });
+  });
+};
+
+exports.resendTokenPost = (req, res, next) => {
+  // find user with this email
+  User.find({ email: req.body.email }, (err, user) => {
+    console.log(user[0]);
+    //if this user doesnt exit,return this error message
+    if (!user[0]) {
+      return res.status(400).send({
+        msg: "We were unable to find a user with that email."
+      });
+    }
+    //if status of isVerified on user model is true then return this error meaning that this user has already verified hhis or her account
+    if (user[0].isVerified) {
+      return res.status(400).send({
+        msg: "This account has already been verified. Please login."
+      });
+    }
+
+    //This will create a new token
+    var token = new Token({
+      _userId: user[0]._id,
+      token: crypto.randomBytes(16).toString("hex")
+    });
+
+    //save the token on the token model/collection
+    token.save(err => {
+      if (err) {
+        return res.status(500).send({ msg: err.message });
+      }
+
+      //function to send mail to the user
+      let transporter = nodemailer.createTransport({
+        // host: "mail.google.com",
+        service: "gmail",
+        // port: 587,
+        secure: false,
+        auth: {
+          user: "ekpotwisdom@gmail.com", // generated ethereal user
+          pass: "spinosky" // generated ethereal password
+        },
+        tls: {
+          rejectUnauthorized: false
+        }
+      });
+
+      //mail option
+      var mailOptions = {
+        from: "no-reply@yourwebapplication.com",
+        to: user[0].email,
+        subject: "Account Verification Token",
+        // this is the body of the mail that is sent the the valid user
+        text:
+          "Hello,\n\n" +
+          "Please verify your account by clicking the link: \nhttp://" +
+          req.headers.host +
+          "/api/users/confirmation/" +
+          token.token +
+          ".\n"
+      };
+
+      //action to send the mail
+      transporter.sendMail(mailOptions, function(err) {
+        // check if there are any errors
+        if (err) {
+          return res.status(500).send({ msg: err.message });
+        }
+        // response to the user when the register
+        res
+          .status(200)
+          .send("A verification email has been sent to " + user[0].email + ".");
       });
     });
   });
