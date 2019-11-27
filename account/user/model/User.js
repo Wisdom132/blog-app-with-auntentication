@@ -19,11 +19,8 @@ const userSchema = mongoose.Schema({
     unique: true,
     required: true
   },
+  isVerified: { type: Boolean, default: false },
   password: {
-    type: String,
-    required: true
-  },
-  contact: {
     type: String,
     required: true
   }
@@ -42,9 +39,9 @@ module.exports.getUserByUsername = (username, callback) => {
   const query = {
     username: username
   };
+  console.log(username);
   User.findOne(query, callback);
 };
-
 // To register the user
 module.exports.addUser = (newUser, callback) => {
   bcrypt.genSalt(10, (err, salt) => {
@@ -59,7 +56,10 @@ module.exports.addUser = (newUser, callback) => {
 // compare password
 module.exports.comparePassword = (password, hash, callback) => {
   bcrypt.compare(password, hash, (err, isMatch) => {
-    if (err) throw err;
+    if (err) {
+      res.status(404).json(err);
+    }
+
     callback(null, isMatch);
   });
 };

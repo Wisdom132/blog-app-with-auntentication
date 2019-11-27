@@ -37,9 +37,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // configure page error handling
-const error = require("./config/error");
-app.use(error.error);
-app.use(error.err);
+// const error = require("./config/error");
+// app.use(error.error);
+// app.use(error.err);
 
 app.get("/", (req, res) => {
   res.send("Hello World");

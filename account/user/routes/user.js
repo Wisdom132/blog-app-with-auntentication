@@ -11,6 +11,8 @@ router.post("/register", userController.registerUser);
 router.post("/login", userController.loginUser);
 //get all users
 router.get("/users", userController.getUsers);
+router.get("/confirmation/:token", userController.confirmationPost);
+// router.post("/resend", userController.resendTokenPost);
 router.get(
   "/profile",
   passport.authenticate("jwt", { session: false }),
