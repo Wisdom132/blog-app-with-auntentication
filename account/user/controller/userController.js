@@ -7,7 +7,25 @@ const passport = require("passport");
 const config = require("../../../config/database");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const async = require("async");
 
+//Define nodemailer transporter
+let transporter = nodemailer.createTransport({
+  // host: "mail.google.com",
+  service: "gmail",
+  // port: 587,
+  secure: false,
+  auth: {
+    user: "ekpotwisdom@gmail.com", // generated ethereal user
+    pass: "spinosky" // generated ethereal password
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+});
+//nodemailer transporter ends here
+
+// create a new user
 exports.registerUser = (req, res) => {
   // function to create a new user
   let newUser = new User({
@@ -92,6 +110,7 @@ exports.registerUser = (req, res) => {
   });
 };
 
+// Send email confimation link to users email
 exports.confirmationPost = (req, res, next) => {
   // here we use the find method to get the token from the email params
   Token.findOne({ token: req.params.token }, (err, token) => {
@@ -133,6 +152,7 @@ exports.confirmationPost = (req, res, next) => {
   });
 };
 
+// resend token to users email where neccessary
 exports.resendTokenPost = (req, res, next) => {
   // find user with this email
   User.find({ email: req.body.email }, (err, user) => {
@@ -161,24 +181,8 @@ exports.resendTokenPost = (req, res, next) => {
       if (err) {
         return res.status(500).send({ msg: err.message });
       }
-
-      //function to send mail to the user
-      let transporter = nodemailer.createTransport({
-        // host: "mail.google.com",
-        service: "gmail",
-        // port: 587,
-        secure: false,
-        auth: {
-          user: "ekpotwisdom@gmail.com", // generated ethereal user
-          pass: "spinosky" // generated ethereal password
-        },
-        tls: {
-          rejectUnauthorized: false
-        }
-      });
-
       //mail option
-      var mailOptions = {
+      let mailOptions = {
         from: "no-reply@yourwebapplication.com",
         to: user[0].email,
         subject: "Account Verification Token",
@@ -207,6 +211,7 @@ exports.resendTokenPost = (req, res, next) => {
   });
 };
 
+//login the user and the email has ben verified
 exports.loginUser = (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
@@ -262,6 +267,78 @@ exports.loginUser = (req, res) => {
   });
 };
 
+//send email to users email to reset password
+exports.forgotPassword = (req, res) => {
+  async.waterfall(
+    [
+      //first function ==> to find user
+      done => {
+        // find user with his or her email
+        User.findOne({ email: req.body.email }).exec((err, user) => {
+          if (user) {
+            done(err, user);
+          } else {
+            done("User not found.");
+          }
+        });
+      },
+      //second function ===> to generate token
+      (user, done) => {
+        // create the random token
+        crypto.randomBytes(16, (err, buffer) => {
+          let token = buffer.toString("hex");
+          done(err, user, token);
+        });
+      },
+      // third function ===> find user email and the assign reset_password_token to the generated token
+      (user, token, done) => {
+        // find user using the user id and set the reset password token to the generated token
+        User.findByIdAndUpdate(
+          { _id: user._id },
+          {
+            reset_password_token: token,
+            reset_password_expires: Date.now() + 86400000
+          },
+          { upsert: true, new: true }
+        ).exec(function(err, new_user) {
+          done(err, token, new_user);
+        });
+      },
+      // forth function ==> create simple email template
+      (token, user, done) => {
+        let data = {
+          to: user.email,
+          from: "no-reply@yourwebapplication.com",
+          template: "forgot-password-email",
+          subject: "Password help has arrived!",
+          text:
+            "Hello,\n\n" +
+            "Please reset you password by clicking the link: \nhttp://" +
+            req.headers.host +
+            "/api/users/reset-password?token=" +
+            token
+        };
+
+        //action to send token to user
+        transporter.sendMail(data, err => {
+          if (!err) {
+            return res.json({
+              msg: err.message,
+              message: "Kindly check your email for further instructions"
+            });
+          } else {
+            res.status(200).json("Sent");
+          }
+        });
+      }
+    ],
+    err => {
+      return res.status(422).json({ message: err });
+    }
+  );
+};
+
+// get all the users data
 exports.getUsers = async (req, res) => {
   try {
     let response = await User.find();
@@ -273,14 +350,10 @@ exports.getUsers = async (req, res) => {
   }
 };
 
-exports.googleStrategy = passport.authenticate("google", {
-  scope: ["profile"]
-});
-
-(exports.googleRedirect = passport.authenticate("google")),
-  (req, res) => {
-    res.send("This is google redirect");
-  };
+//log user out and delete token
+exports.logUserOut = (req, res) => {
+  req.logout();
+};
 
 //get authenticated user profile
 exports.getAuthenticatedUserProfile = async (req, res) => {
@@ -295,6 +368,7 @@ exports.getAuthenticatedUserProfile = async (req, res) => {
   }
 };
 
+//delete user from db
 exports.deleteUserInfo = async (req, res) => {
   let id = req.params.id;
   try {
@@ -309,3 +383,14 @@ exports.deleteUserInfo = async (req, res) => {
     });
   }
 };
+
+// still login with google strategy
+exports.googleStrategy = passport.authenticate("google", {
+  scope: ["profile"]
+});
+
+//redirect user if valid
+(exports.googleRedirect = passport.authenticate("google")),
+  (req, res) => {
+    res.send("This is google redirect");
+  };

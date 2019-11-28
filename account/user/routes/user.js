@@ -9,10 +9,15 @@ const passport = require("passport");
 router.post("/register", userController.registerUser);
 //custom user login
 router.post("/login", userController.loginUser);
+
+// loguser out
+router.get("/logout", userController.logUserOut);
 //get all users
 router.get("/users", userController.getUsers);
 router.get("/confirmation/:token", userController.confirmationPost);
 router.post("/resend", userController.resendTokenPost);
+
+router.post("/forgot-password", userController.forgotPassword);
 router.get(
   "/profile",
   passport.authenticate("jwt", { session: false }),
