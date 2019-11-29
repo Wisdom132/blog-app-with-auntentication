@@ -18,6 +18,10 @@ router.get("/confirmation/:token", userController.confirmationPost);
 router.post("/resend", userController.resendTokenPost);
 
 router.post("/forgot-password", userController.forgotPassword);
+
+router.get("/reset-password/:token", userController.getUserToken);
+router.post("/reset-password/:token", userController.resetPassword);
+
 router.get(
   "/profile",
   passport.authenticate("jwt", { session: false }),

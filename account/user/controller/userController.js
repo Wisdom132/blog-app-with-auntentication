@@ -8,6 +8,7 @@ const config = require("../../../config/database");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 const async = require("async");
+const bcrypt = require("bcrypt");
 
 //Define nodemailer transporter
 let transporter = nodemailer.createTransport({
@@ -292,12 +293,13 @@ exports.forgotPassword = (req, res) => {
       },
       // third function ===> find user email and the assign reset_password_token to the generated token
       (user, token, done) => {
+        console.log(user);
         // find user using the user id and set the reset password token to the generated token
         User.findByIdAndUpdate(
           { _id: user._id },
           {
-            reset_password_token: token,
-            reset_password_expires: Date.now() + 86400000
+            resetPasswordToken: token,
+            resetPasswordExpires: Date.now() + 86400000
           },
           { upsert: true, new: true }
         ).exec(function(err, new_user) {
@@ -315,7 +317,7 @@ exports.forgotPassword = (req, res) => {
             "Hello,\n\n" +
             "Please reset you password by clicking the link: \nhttp://" +
             req.headers.host +
-            "/api/users/reset-password?token=" +
+            "/api/users/reset-password/" +
             token
         };
 
@@ -323,11 +325,12 @@ exports.forgotPassword = (req, res) => {
         transporter.sendMail(data, err => {
           if (!err) {
             return res.json({
-              msg: err.message,
               message: "Kindly check your email for further instructions"
             });
           } else {
-            res.status(200).json("Sent");
+            res.status(200).json({
+              message: err
+            });
           }
         });
       }
@@ -336,6 +339,148 @@ exports.forgotPassword = (req, res) => {
       return res.status(422).json({ message: err });
     }
   );
+};
+
+exports.getUserToken = (req, res) => {
+  User.findOne(
+    {
+      resetPasswordToken: req.params.token,
+      resetPasswordExpires: { $gt: Date.now() }
+    },
+    (err, user) => {
+      if (!user) {
+        res.status(500).json({ error: err });
+      } else {
+        console.log({ data: user });
+      }
+    }
+  );
+};
+
+// exports.resetPassword = (res, req, next) => {
+//   async.waterfall(
+//     [
+//       function(done) {
+//         User.findOne(
+//           {
+//             resetPasswordToken: req.req.params.token,
+//             resetPasswordExpires: { $gt: Date.now() }
+//           },
+//           (err, user) => {
+//             console.log(user);
+//             if (!user) {
+//               res.res.send("Something is wrong");
+//             }
+//             user.password = req.req.body.password;
+//             user.resetPasswordToken = undefined;
+//             user.resetPasswordExpires = undefined;
+
+//             user.save(err => {
+//               req.req.logIn(user, err => {
+//                 done(err, user);
+//               });
+//             });
+//           }
+//         );
+//       },
+//       (user, done) => {
+//         var data = {
+//           to: user.email,
+//           from: "no-reply@yourwebapplication.com",
+//           template: "forgot-password-email",
+//           subject: "Password help has arrived!",
+//           text:
+//             "Hello,\n\n" +
+//             "This is a confirmation that the password for your account " +
+//             user.email +
+//             " has just been changed.\n"
+//         };
+//         transporter.sendMail(data, (err, json) => {
+//           if (err) {
+//             return console.error(err);
+//           } else {
+//             return res.json({
+//               message: "Password Reset Success"
+//             });
+//             console.log(json);
+//             done(err);
+//           }
+//         });
+//       }
+//     ],
+//     err => {
+//       res.res.status(400).json({
+//         error: "wejbkj"
+//       });
+//     }
+//   );
+// };
+
+exports.resetPassword = (res, req, next) => {
+  // get the token and pass it as a body
+  console.log(req.req.body.newPassword);
+  console.log(req.req.body.verifyPassword);
+  console.log(req.req.params.token);
+  User.findOne({
+    resetPasswordToken: req.req.params.token,
+    resetPasswordExpires: {
+      $gt: Date.now()
+    }
+  }).exec((err, user) => {
+    //check if there isnt an error and also check if this is a valid user
+    if (!err && user) {
+      // if this is a valid user ==> run the code below
+
+      if (req.req.body.newPassword === req.req.body.verifyPassword) {
+        //check if new password === verifypassword
+        user.password = bcrypt.hashSync(req.req.body.newPassword, 10); //hash the new password
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+        user.save(err => {
+          //save the new password
+          if (err) {
+            return res.res.status(422).send({
+              message: err
+            });
+          } else {
+            var data = {
+              to: user.email,
+              from: "no-reply@yourwebapplication.com",
+              template: "forgot-password-email",
+              subject: "Password help has arrived!",
+              text:
+                "Hello,\n\n" +
+                "This is a confirmation that the password for your account " +
+                user.email +
+                " has just been changed.\n"
+            };
+
+            transporter.sendMail(data, err => {
+              //send mail to the new user
+              if (!err) {
+                return res.json({
+                  message: "Password Reset"
+                });
+              } else {
+                res.status(200).json({
+                  message: "Something Went Wrong",
+                  error: err
+                });
+              }
+            });
+          }
+        });
+      } else {
+        return res.res.status(422).json({
+          message: "Passwords do not match"
+        });
+      }
+    } else {
+      return res.res.status(400).send({
+        message: "Password reset token is invalid or has expired."
+      });
+    }
+  });
 };
 
 // get all the users data
