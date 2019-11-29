@@ -357,65 +357,6 @@ exports.getUserToken = (req, res) => {
   );
 };
 
-// exports.resetPassword = (res, req, next) => {
-//   async.waterfall(
-//     [
-//       function(done) {
-//         User.findOne(
-//           {
-//             resetPasswordToken: req.req.params.token,
-//             resetPasswordExpires: { $gt: Date.now() }
-//           },
-//           (err, user) => {
-//             console.log(user);
-//             if (!user) {
-//               res.res.send("Something is wrong");
-//             }
-//             user.password = req.req.body.password;
-//             user.resetPasswordToken = undefined;
-//             user.resetPasswordExpires = undefined;
-
-//             user.save(err => {
-//               req.req.logIn(user, err => {
-//                 done(err, user);
-//               });
-//             });
-//           }
-//         );
-//       },
-//       (user, done) => {
-//         var data = {
-//           to: user.email,
-//           from: "no-reply@yourwebapplication.com",
-//           template: "forgot-password-email",
-//           subject: "Password help has arrived!",
-//           text:
-//             "Hello,\n\n" +
-//             "This is a confirmation that the password for your account " +
-//             user.email +
-//             " has just been changed.\n"
-//         };
-//         transporter.sendMail(data, (err, json) => {
-//           if (err) {
-//             return console.error(err);
-//           } else {
-//             return res.json({
-//               message: "Password Reset Success"
-//             });
-//             console.log(json);
-//             done(err);
-//           }
-//         });
-//       }
-//     ],
-//     err => {
-//       res.res.status(400).json({
-//         error: "wejbkj"
-//       });
-//     }
-//   );
-// };
-
 exports.resetPassword = (res, req, next) => {
   // get the token and pass it as a body
   console.log(req.req.body.newPassword);
@@ -467,6 +408,9 @@ exports.resetPassword = (res, req, next) => {
                   error: err
                 });
               }
+            });
+            res.res.status(200).json({
+              message: "Password Changed Successfully"
             });
           }
         });
