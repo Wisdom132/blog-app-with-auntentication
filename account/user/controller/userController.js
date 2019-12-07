@@ -65,24 +65,8 @@ exports.registerUser = (req, res) => {
       if (err) {
         return res.status(500).send({ msg: err.message });
       }
-
-      // send email to user
-      let transporter = nodemailer.createTransport({
-        // host: "mail.google.com",
-        service: "gmail",
-        // port: 587,
-        secure: false,
-        auth: {
-          user: "ekpotwisdom@gmail.com", // generated ethereal user
-          pass: "spinosky" // generated ethereal password
-        },
-        tls: {
-          rejectUnauthorized: false
-        }
-      });
-
       //define the email template
-      var mailOptions = {
+      let mailOptions = {
         from: "no-reply@yourwebapplication.com",
         to: newUser.email,
         subject: "Account Verification Token",
@@ -95,7 +79,6 @@ exports.registerUser = (req, res) => {
           token.token +
           ".\n"
       };
-
       // action to actually send the email
       transporter.sendMail(mailOptions, function(err) {
         // check if there are any errors
