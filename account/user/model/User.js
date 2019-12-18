@@ -4,10 +4,6 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 // user Schema
 const userSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true
-  },
   email: {
     type: String,
     unique: true,
@@ -28,6 +24,10 @@ const userSchema = mongoose.Schema({
     type: String
   },
   resetPasswordExpires: {
+    type: Date
+  },
+  dateCreated: {
+    default: Date.now(),
     type: Date
   }
 });

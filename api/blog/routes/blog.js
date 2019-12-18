@@ -4,9 +4,9 @@ const Blog = require("../model/blog");
 const upload = require("../../../config/multer");
 const blogController = require("../controllers/blogController");
 
-router.get("/blog", blogController.getBlogPosts);
+router.get("/", blogController.getBlogPosts);
 router.post(
-  "/blog",
+  "/",
   upload.upload.single("featured_image"),
   blogController.createNewPost
 );

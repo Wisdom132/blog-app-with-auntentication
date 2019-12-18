@@ -30,7 +30,7 @@ let transporter = nodemailer.createTransport({
 exports.registerUser = (req, res) => {
   // function to create a new user
   let newUser = new User({
-    name: req.body.name,
+    // name: req.body.name,
     email: req.body.email,
     username: req.body.username,
     password: req.body.password
@@ -203,7 +203,6 @@ exports.loginUser = (req, res) => {
     if (err) {
       res.status(404).json(err);
     }
-    console.log(username);
     if (!user) {
       return res.status(404).json({
         success: false,
