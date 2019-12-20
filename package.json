@@ -4,7 +4,7 @@
   "description": "An fx blog app",
   "main": "index.js",
   "scripts": {
-    "start": "index.js",
+    "start": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -27,6 +27,7 @@
     "morgan": "^1.9.1",
     "multer": "^1.4.2",
     "nodemailer": "^6.3.1",
+    "nodemon": "^2.0.2",
     "passport": "^0.4.0",
     "passport-google-oauth": "^2.0.0",
     "passport-jwt": "^4.0.0"
