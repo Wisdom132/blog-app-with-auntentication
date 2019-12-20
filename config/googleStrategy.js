@@ -5,8 +5,11 @@ let User = require("../account/user/model/User");
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientID:
+        "581244986088-d2lp7iuo6f3qed1boi7sa05mtoiho3ae.apps.googleusercontent.com",
+      clientSecret: "rKArI-0bMZgRgjQu6hgMiuhd",
+      // clientID: process.env.GOOGLE_CLIENT_ID,
+      // clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "/api/users/google/redirect"
     },
     (accessToken, refreshToken, profile, cb) => {
