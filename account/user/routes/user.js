@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controller/userController");
 const jwt = require("jsonwebtoken");
-
+const auth = require("../../../config/auth");
 const passport = require("passport");
 
 // custome user registration
@@ -13,7 +13,7 @@ router.post("/login", userController.loginUser);
 // loguser out
 router.get("/logout", userController.logUserOut);
 //get all users
-router.get("/users", userController.getUsers);
+router.get("/users", auth, userController.getUsers);
 router.get("/confirmation/:token", userController.confirmationPost);
 router.post("/resend", userController.resendTokenPost);
 

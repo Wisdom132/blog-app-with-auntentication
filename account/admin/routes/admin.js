@@ -4,11 +4,12 @@ const adminController = require("../controller/adminController");
 const jwt = require("jsonwebtoken");
 
 const passport = require("passport");
+const auth = require("../../../config/auth");
 
 // custome user registration
 router.post("/register", adminController.registerAdmin);
 //custom user login
-router.post("/login", adminController.loginAdmin);
+router.post("/login", auth, adminController.loginAdmin);
 //get all users
 router.get("/admin", adminController.getAdmin);
 router.get(
