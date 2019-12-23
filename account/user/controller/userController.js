@@ -38,20 +38,19 @@ exports.registerUser = (req, res) => {
   // function to add user to the database
   User.addUser(newUser, (err, user) => {
     if (err) {
-      let message = "";
-      // validation to check if username is aleady taken by anothe user
       if (err.errors.username) {
-        message = "Username is already in use";
+        res.status(500).json({
+          message: "Username is already in use"
+        });
+      } else if (err.errors.email) {
+        res.status(500).json({
+          message: "Email is already in use"
+        });
+      } else {
+        res.status(500).json({
+          error: err
+        });
       }
-      // validtion to check if email is taken by another user
-      if (err.errors.email) {
-        message = "Email is already in use";
-      }
-
-      res.status(401).json({
-        message: false,
-        err
-      });
     }
 
     // function to create a new token
@@ -88,7 +87,7 @@ exports.registerUser = (req, res) => {
         // response to the user when the register
         res
           .status(200)
-          .send("A verification email has been sent to " + newUser.email + ".");
+          .json("A verification email has been sent to " + newUser.email + ".");
       });
     });
   });
