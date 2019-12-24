@@ -9,7 +9,7 @@ const auth = require("../../../config/auth");
 // custome user registration
 router.post("/register", adminController.registerAdmin);
 //custom user login
-router.post("/login", auth, adminController.loginAdmin);
+router.post("/login", adminController.loginAdmin);
 //get all users
 router.get("/admin", adminController.getAdmin);
 router.get(
