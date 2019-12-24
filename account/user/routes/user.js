@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controller/userController");
 const jwt = require("jsonwebtoken");
-const auth = require("../../../config/auth");
 const passport = require("passport");
+const auth = require("../../../config/auth");
 
 // custome user registration
 router.post("/register", userController.registerUser);
