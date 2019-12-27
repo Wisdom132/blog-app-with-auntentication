@@ -29,6 +29,12 @@ let transporter = nodemailer.createTransport({
 // create a new user
 exports.registerUser = (req, res) => {
   // function to create a new user
+  if (!req.body.password && !req.body.email && !req.body.username) {
+    res.status(500).json({
+      success: false,
+      msg: "All Fields are required"
+    });
+  }
   let newUser = new User({
     // name: req.body.name,
     email: req.body.email,
@@ -40,15 +46,18 @@ exports.registerUser = (req, res) => {
     if (err) {
       if (err.errors.username) {
         res.status(500).json({
-          message: "Username is already in use"
+          success: false,
+          msg: "Username is already in use"
         });
       } else if (err.errors.email) {
         res.status(500).json({
-          message: "Email is already in use"
+          success: false,
+          msg: "Email is already in use"
         });
       } else {
         res.status(500).json({
-          error: err
+          error: err,
+          msg: "Something Went Wrong"
         });
       }
     }
@@ -205,7 +214,7 @@ exports.loginUser = (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Wrong Login Details"
+        msg: "Wrong Login Details"
       });
     }
     if (!user.isVerified) {
@@ -242,7 +251,7 @@ exports.loginUser = (req, res) => {
       } else {
         return res.status(404).json({
           success: false,
-          message: "Wrong Login Details"
+          msg: "Wrong Login Details"
         });
       }
     });

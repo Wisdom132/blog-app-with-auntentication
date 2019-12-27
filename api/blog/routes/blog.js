@@ -12,8 +12,8 @@ router.post(
   upload.upload.single("featured_image"),
   blogController.createNewPost
 );
-router.get("/blog/:id", auth, blogController.getBlogPostById);
-router.get("/blog/category/:id", auth, blogController.getPostByCateggory);
+router.get("/:id", auth, blogController.getBlogPostById);
+router.get("/category/:id", auth, blogController.getPostByCateggory);
 router.delete("/blog/:id", auth, blogController.removeBlogPost);
 
 module.exports = router;

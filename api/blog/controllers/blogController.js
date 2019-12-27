@@ -49,7 +49,7 @@ exports.getBlogPostById = async (req, res) => {
     let response = await Blog.findById({ _id: id })
       .populate("category")
       .select(
-        "tags dateCreated title content category.title category.description"
+        "tags dateCreated title content category.title category.description featured_image"
       );
     res.status(200).json({
       response
@@ -81,7 +81,7 @@ exports.getPostByCateggory = async (req, res) => {
   try {
     let response = await Blog.find({
       category: req.params.id
-    });
+    }).populate("category");
     res.status(200).json({
       data: response
     });
