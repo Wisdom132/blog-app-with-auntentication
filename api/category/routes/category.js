@@ -7,6 +7,6 @@ const auth = require("../../../config/auth");
 router.get("/", auth, categoryController.getCategory);
 router.post("/", auth, categoryController.createNewCategory);
 router.get("/:id", auth, categoryController.getCategoryById);
-router.delete("/category/:id", auth, categoryController.removeCategory);
+router.delete("/:id", auth, categoryController.removeCategory);
 
 module.exports = router;
