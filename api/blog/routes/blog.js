@@ -9,7 +9,8 @@ router.get("/", auth, blogController.getBlogPosts);
 router.post(
   "/",
   auth,
-  upload.upload.single("featured_image"),
+  upload.upload.array("featured_image", 3),
+  // upload.single("featured_image"),
   blogController.createNewPost
 );
 router.get("/:id", auth, blogController.getBlogPostById);

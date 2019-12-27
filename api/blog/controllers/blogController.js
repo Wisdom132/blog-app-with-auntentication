@@ -2,6 +2,7 @@ const express = require("express");
 const Blog = require("../model/blog");
 const Category = require("../../category/model/category");
 const upload = require("../../../config/multer");
+const cloud = require("../../../config/cloudinary");
 
 // get all blog post
 exports.getBlogPosts = async (req, res) => {
@@ -23,13 +24,22 @@ exports.getBlogPosts = async (req, res) => {
 
 // create a new blog post
 exports.createNewPost = async (req, res) => {
+  let images = [];
+  for (let file of req.files) {
+    let result = await cloud.uploads(file.path);
+
+    images.push(result.url);
+  }
   try {
+    let result = await cloud.uploads();
+    console.log(result);
     let blog = new Blog({
       title: req.body.title,
       tags: req.body.tags,
       category: req.body.category,
       content: req.body.content,
-      featured_image: req.file
+      // featured_image: req.file
+      featured_image: images
     });
 
     let response = await blog.save();
