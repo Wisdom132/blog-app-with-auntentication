@@ -10,7 +10,7 @@ exports.getBlogPosts = async (req, res) => {
     let response = await Blog.find()
       .populate("category")
       .select(
-        "tags dateCreated title content category.title category.description featured_image.path featured_image.originalname"
+        "tags dateCreated title content category.title category.description featured_image"
       );
     res.status(200).json({
       data: response
