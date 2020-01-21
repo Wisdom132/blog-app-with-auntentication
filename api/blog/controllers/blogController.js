@@ -22,6 +22,21 @@ exports.getBlogPosts = async (req, res) => {
   }
 };
 
+exports.getAllPostsAndCategory = async (req, res) => {
+  try {
+    let response = await Blog.aggregate([
+      { $group: { _id: "$category", posts: { $push: "$$ROOT" } } }
+    ]);
+    res.status(200).json({
+      data: response
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err
+    });
+  }
+};
+
 // create a new blog post
 exports.createNewPost = async (req, res) => {
   let images = [];
@@ -38,7 +53,6 @@ exports.createNewPost = async (req, res) => {
       tags: req.body.tags,
       category: req.body.category,
       content: req.body.content,
-      // featured_image: req.file
       featured_image: images
     });
 

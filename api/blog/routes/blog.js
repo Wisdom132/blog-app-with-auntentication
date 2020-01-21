@@ -6,11 +6,11 @@ const blogController = require("../controllers/blogController");
 const auth = require("../../../config/auth");
 
 router.get("/", blogController.getBlogPosts);
+router.get("/get-category-blog", blogController.getAllPostsAndCategory);
 router.post(
   "/",
   auth,
   upload.upload.array("featured_image", 3),
-  // upload.single("featured_image"),
   blogController.createNewPost
 );
 router.get("/:id", blogController.getBlogPostById);
