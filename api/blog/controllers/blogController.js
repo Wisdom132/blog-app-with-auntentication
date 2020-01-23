@@ -22,11 +22,20 @@ exports.getBlogPosts = async (req, res) => {
   }
 };
 
+
+
 exports.getAllPostsAndCategory = async (req, res) => {
   try {
     let response = await Blog.aggregate([
-      { $group: { _id: "$category", posts: { $push: "$$ROOT" } } }
-    ]);
+       {$lookup:{
+        from: 'categories',
+        localField: 'category',
+        foreignField: '_id',
+        as: 'category'
+}},
+      { $group: { _id: "$category", posts: { $push: "$$ROOT" } } },
+     
+    ])
     res.status(200).json({
       data: response
     });
@@ -34,8 +43,12 @@ exports.getAllPostsAndCategory = async (req, res) => {
     res.status(500).json({
       error: err
     });
+    console.log(err)
   }
 };
+
+
+
 
 // create a new blog post
 exports.createNewPost = async (req, res) => {
