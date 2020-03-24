@@ -23,7 +23,6 @@ exports.getBlogPosts = async (req, res) => {
 };
 
 
-
 exports.getAllPostsAndCategory = async (req, res) => {
   try {
     let response = await Blog.aggregate([
@@ -46,9 +45,6 @@ exports.getAllPostsAndCategory = async (req, res) => {
     console.log(err)
   }
 };
-
-
-
 
 // create a new blog post
 exports.createNewPost = async (req, res) => {
@@ -128,3 +124,17 @@ exports.getPostByCateggory = async (req, res) => {
     });
   }
 };
+
+exports.updateBlogData = async (req,res) => {
+  try {
+        const id = req.params.id;
+    let response = await Blog.findByIdAndUpdate(id,{$set:req.body});
+     res.status(200).json({
+      data: response
+    });
+  }catch(err) {
+    res.status(500).json({
+      error: err
+    });
+  }
+}
