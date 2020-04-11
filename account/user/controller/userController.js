@@ -158,19 +158,19 @@ exports.confirmationPost = (req, res, next) => {
 // resend token to users email where neccessary
 exports.resendTokenPost = (req, res, next) => {
 	// find user with this email
-	User.find({
+	User.findOne({
 			email: req.body.email
 		},
 		(err, user) => {
-			console.log(user[0]);
+			console.log(user);
 			//if this user doesnt exit,return this error message
-			if (!user[0]) {
+			if (!user) {
 				return res.status(400).send({
 					msg: 'We were unable to find a user with that email.'
 				});
 			}
 			//if status of isVerified on user model is true then return this error meaning that this user has already verified hhis or her account
-			if (user[0].isVerified) {
+			if (user.isVerified) {
 				return res.status(400).send({
 					msg: 'This account has already been verified. Please login.'
 				});
@@ -178,7 +178,7 @@ exports.resendTokenPost = (req, res, next) => {
 
 			//This will create a new token
 			var token = new Token({
-				_userId: user[0]._id,
+				_userId: user._id,
 				token: crypto.randomBytes(16).toString('hex')
 			});
 
@@ -192,7 +192,7 @@ exports.resendTokenPost = (req, res, next) => {
 				//mail option
 				let mailOptions = {
 					from: 'no-reply@yourwebapplication.com',
-					to: user[0].email,
+					to: user.email,
 					subject: 'Account Verification Token',
 					// this is the body of the mail that is sent the the valid user
 					text: 'Hello,\n\n' +
