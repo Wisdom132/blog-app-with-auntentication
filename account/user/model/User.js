@@ -15,7 +15,18 @@ const userSchema = mongoose.Schema({
     unique: true,
     required: true
   },
-  isVerified: { type: Boolean, default: false },
+  phone: {
+    type: String,
+    required: true
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
   password: {
     type: String,
     required: [true, "Password is required"]
@@ -26,11 +37,10 @@ const userSchema = mongoose.Schema({
   resetPasswordExpires: {
     type: Date
   },
-  dateCreated: {
-    default: Date.now(),
-    type: Date
-  }
-});
+
+}, {
+  timestamps: true,
+}, );
 
 userSchema.plugin(uniqueValidator);
 const User = (module.exports = mongoose.model("User", userSchema));

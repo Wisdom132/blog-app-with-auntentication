@@ -57,8 +57,7 @@ exports.loginAdmin = (req, res) => {
         res.json(err);
       }
       if (isMatch) {
-        const token = jwt.sign(
-          {
+        const token = jwt.sign({
             type: "admin",
             data: {
               _id: admin._id,
@@ -69,8 +68,9 @@ exports.loginAdmin = (req, res) => {
               job_profile: admin.job_profile
             }
           },
-          config.secret,
-          { expiresIn: 604800 }
+          config.secret, {
+            expiresIn: 604800
+          }
         );
         return res.json({
           success: true,
@@ -113,7 +113,9 @@ exports.getAuthenticatedAdminProfile = async (req, res) => {
 exports.deleteAdminInfo = async (req, res) => {
   let id = req.params.id;
   try {
-    let response = await Admin.remove({ _id: id });
+    let response = await Admin.remove({
+      _id: id
+    });
     res.status(200).json({
       message: "Admin deleted",
       response: response

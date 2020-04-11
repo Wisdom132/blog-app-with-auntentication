@@ -13,12 +13,16 @@ const config = require("./config/database");
 //connect to the database
 mongoose.set("useCreateIndex", true);
 mongoose
-  .connect(config.database, { useNewUrlParser: true })
+  .connect(config.database, {
+    useNewUrlParser: true
+  })
   .then(() => {
     console.log("Database is connected");
   })
   .catch(err => {
-    console.log({ database_error: err });
+    console.log({
+      database_error: err
+    });
   });
 //initialize the modules
 const app = express();
@@ -70,6 +74,12 @@ app.use("/api/blog", blogPost);
 //category routes
 const category = require("./api/category/routes/category");
 app.use("/api/category", category);
+
+
+//draft routes
+const draft = require("./api/draft/routes/draftRoutes")
+app.use("/api/draft", draft);
+
 
 //register port
 app.listen(PORT, () => {

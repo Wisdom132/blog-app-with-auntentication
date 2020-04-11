@@ -24,7 +24,9 @@ router.post("/reset-password/:token", userController.resetPassword);
 
 router.get(
   "/profile",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("jwt", {
+    session: false
+  }),
   userController.getAuthenticatedUserProfile
 );
 router.delete("/users/remove/:id", userController.deleteUserInfo);
