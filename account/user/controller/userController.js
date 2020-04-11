@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -17,8 +18,8 @@ let transporter = nodemailer.createTransport({
 	// port: 587,
 	secure: false,
 	auth: {
-		user: 'ekpotwisdom@gmail.com', // generated ethereal user
-		pass: 'spinosky' // generated ethereal password
+		user: process.env.EMAIL, // generated ethereal user
+		pass: process.env.PASS // generated ethereal password
 	},
 	tls: {
 		rejectUnauthorized: false
