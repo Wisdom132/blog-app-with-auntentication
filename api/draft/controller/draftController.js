@@ -5,7 +5,7 @@ const cloud = require("../../../config/cloudinary");
 exports.getAllDraft = async (req, res) => {
     try {
         let response = await Draft.find()
-            .populate("category")
+            .populate("category drafter")
         res.status(200).json({
             data: response
         });
