@@ -44,8 +44,6 @@ exports.draftNewPost = async (req, res) => {
     }
 };
 
-
-
 exports.getDraftById = async (req, res) => {
     try {
         const id = req.params.id;
@@ -100,7 +98,6 @@ exports.removeDraft = async (req, res) => {
 exports.updateDraft = async (req, res) => {
     try {
         const id = req.params.id;
-
         let response = await Draft.findByIdAndUpdate(id, req.body, {
             new: true
         });
