@@ -73,8 +73,8 @@ exports.registerUser = (req, res) => {
     //save the token
     token.save(function(err) {
       if (err) {
-        return res.status(500).send({
-          msg: err.message
+        return res.status(500).json({
+          msg: "Token Failed"
         });
       }
       //define the email template
@@ -94,12 +94,14 @@ exports.registerUser = (req, res) => {
       transporter.sendMail(mailOptions, function(err) {
         // check if there are any errors
         if (err) {
-          return res.status(500).send({
+          return res.status(500).json({
             msg: err.message
           });
         }
         // response to the user when the register
-        res.status(200).json('A verification email has been sent to ' + newUser.email + '.');
+        res.status(200).json({
+          msg: 'A verification email has been sent to ' + newUser.email + '.'
+        });
       });
     });
   });
@@ -115,7 +117,7 @@ exports.confirmationPost = (req, res, next) => {
       // check if this is a valid token or not
       // if it is a valid token it the passes this validation
       if (!token)
-        return res.status(400).send({
+        return res.status(400).json({
           type: 'not-verified',
           msg: 'We were unable to find a valid token. Your token my have expired.'
         });
@@ -127,14 +129,14 @@ exports.confirmationPost = (req, res, next) => {
         (err, user) => {
           // if this isnt a valid user it displays this error
           if (!user)
-            return res.status(400).send({
+            return res.status(400).josn({
               msg: 'We were unable to find a user for this token.'
             });
 
           // so here if the valid status is true it displays this message
           //remember that `isVerified is set to false by default`
           if (user.isVerified)
-            return res.status(400).send({
+            return res.status(400).json({
               type: 'already-verified',
               msg: 'This user has already been verified.'
             });
@@ -147,7 +149,9 @@ exports.confirmationPost = (req, res, next) => {
                 msg: err.message
               });
             }
-            res.status(200).send('The account has been verified. Please log in.');
+            res.status(200).json({
+              msg: 'The account has been verified. Please log in.'
+            });
           });
         }
       );
@@ -165,13 +169,13 @@ exports.resendTokenPost = (req, res, next) => {
       console.log(user);
       //if this user doesnt exit,return this error message
       if (!user) {
-        return res.status(400).send({
+        return res.status(400).json({
           msg: 'We were unable to find a user with that email.'
         });
       }
       //if status of isVerified on user model is true then return this error meaning that this user has already verified hhis or her account
       if (user.isVerified) {
-        return res.status(400).send({
+        return res.status(400).json({
           msg: 'This account has already been verified. Please login.'
         });
       }
@@ -227,7 +231,10 @@ exports.loginUser = (req, res) => {
   const password = req.body.password;
   User.getUserByUsername(username, (err, user) => {
     if (err) {
-      res.status(404).json(err);
+      res.status(404).json({
+        msg: "Something Went wrong",
+        error: err
+      });
     }
     if (!user) {
       return res.status(404).json({
@@ -236,7 +243,7 @@ exports.loginUser = (req, res) => {
       });
     }
     if (!user.isVerified) {
-      return res.status(401).send({
+      return res.status(401).json({
         type: 'not-verified',
         msg: 'Your account has not been verified.'
       });
@@ -244,7 +251,10 @@ exports.loginUser = (req, res) => {
 
     User.comparePassword(password, user.password, (err, isMatch) => {
       if (err) {
-        res.status(404).json(err);
+        res.status(404).json({
+          msg: "Something went wrong",
+          error: err
+        });
       }
 
       if (isMatch) {
@@ -336,7 +346,7 @@ exports.forgotPassword = (req, res) => {
         transporter.sendMail(data, (err) => {
           if (!err) {
             return res.json({
-              message: 'Kindly check your email for further instructions'
+              msg: 'Kindly check your email for further instructions'
             });
           } else {
             res.status(200).json({
@@ -364,6 +374,7 @@ exports.getUserToken = (req, res) => {
     (err, user) => {
       if (!user) {
         res.status(500).json({
+          msg: "User Not Found",
           error: err
         });
       } else {
@@ -427,18 +438,18 @@ exports.resetPassword = (res, req, next) => {
               }
             });
             res.res.status(200).json({
-              message: 'Password Changed Successfully'
+              msg: 'Password Changed Successfully'
             });
           }
         });
       } else {
         return res.res.status(422).json({
-          message: 'Passwords do not match'
+          msg: 'Passwords do not match'
         });
       }
     } else {
       return res.res.status(400).send({
-        message: 'Password reset token is invalid or has expired.'
+        msg: 'Password reset token is invalid or has expired.'
       });
     }
   });
