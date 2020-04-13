@@ -137,7 +137,7 @@ exports.addDraftToBlog = async (req, res) => {
             tags: tags,
             category: category,
             content: content,
-            featured_image: featured_image[0],
+            featured_image: featured_image,
             writer: drafter
         });
 
