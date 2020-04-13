@@ -1,6 +1,6 @@
 const Draft = require("../../draft/model/draft");
 const cloud = require("../../../config/cloudinary");
-
+const Blog = require("../../blog/model/blog")
 
 exports.getAllDraft = async (req, res) => {
     try {
@@ -104,6 +104,50 @@ exports.updateDraft = async (req, res) => {
         res.status(200).json({
             data: response
         });
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            error: err
+        });
+    }
+}
+
+exports.addDraftToBlog = async (req, res) => {
+    try {
+        const id = req.params.id;
+        let response = await Draft.findById({
+            _id: id
+        })
+        let {
+            title,
+            tags,
+            category,
+            featured_image,
+            content,
+            drafter
+        } = response
+
+        if (!response.isCompleted) {
+            return res.status(400).json({
+                msg: "Draft Not Completed"
+            })
+        }
+        let blog = new Blog({
+            title: title,
+            tags: tags,
+            category: category,
+            content: content,
+            featured_image: featured_image[0],
+            writer: drafter
+        });
+
+        response.isPublished = true;
+        await response.save();
+        let addedFromDraft = await blog.save();
+        res.status(200).json({
+            data: addedFromDraft
+        })
+
     } catch (err) {
         console.log(err)
         res.status(500).json({

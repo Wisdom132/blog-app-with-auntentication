@@ -14,6 +14,7 @@ router.post(
 router.get("/:id", auth, draftController.getDraftById);
 router.get("/drafter/:id", auth, draftController.getDraftByUser);
 router.delete("/:id", auth, draftController.removeDraft);
+router.post("/add-draft-to-blog/:id", draftController.addDraftToBlog)
 router.put("/update/:id", auth, draftController.updateDraft);
 
 module.exports = router;

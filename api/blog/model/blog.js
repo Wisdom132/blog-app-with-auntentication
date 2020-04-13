@@ -17,6 +17,10 @@ const blogSchema = mongoose.Schema({
     type: Object,
     required: true
   },
+  writer: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: false
+  },
   content: {
     type: String,
     required: true
